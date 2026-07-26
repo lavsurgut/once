@@ -40,7 +40,7 @@
 (def ^:private once-sha "e6f4ea491609f1ae0f3709ea5643942971967174")
 (def ^:private green-sha "fb3587ce99b1e8082dada3103c1016cde61e8b74")
 
-(def ^:private once-git-url "https://github.com/bigconfig-ai/once.git")
+(def ^:private once-git-url "https://github.com/lavsurgut/once.git")
 (def ^:private green-git-url "https://github.com/amiorin/green.git")
 
 (defn- lib-coord
