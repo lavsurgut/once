@@ -37,7 +37,7 @@
   5)
 
 ;; Managed by `bb pin` — do not edit by hand.
-(def ^:private once-sha "89a706b6e8f7d0fc82c5bc60a9d2695ae622819e")
+(def ^:private once-sha "55deaa2983d629cb3bb7aeeae1f37e892c7e98c6")
 (def ^:private green-sha "fb3587ce99b1e8082dada3103c1016cde61e8b74")
 
 (def ^:private once-git-url "https://github.com/lavsurgut/once.git")
