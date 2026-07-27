@@ -114,7 +114,11 @@
                main
                "nat_ip_address = yandex_vpc_address.addr.external_ipv4_address[0].address")))
         (testing "and tofu may stop the instance to attach it"
-          (is (str/includes? main "allow_stopping_for_update = true"))))
+          (is (str/includes? main "allow_stopping_for_update = true")))
+        (testing "a newer image in the family does not schedule a replacement"
+          (is (str/includes?
+               main
+               "ignore_changes = [boot_disk[0].initialize_params[0].image_id]"))))
       (finally
         (delete-tree! workdir)))))
 

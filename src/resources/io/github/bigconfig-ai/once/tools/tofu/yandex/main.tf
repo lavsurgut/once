@@ -94,6 +94,15 @@ resource "yandex_compute_instance" "node1" {
   }
   lifecycle {
     prevent_destroy = <{ compute-prevent-destroy }>
+
+    # The image is looked up by family, which resolves to whatever Yandex has
+    # published most recently, and a boot disk's image is immutable — so every
+    # upstream release would otherwise plan a replacement of the server, and
+    # with prevent_destroy set the plan fails outright. A single-server install
+    # keeps its disk; the OS is updated in place, and adopting a new base image
+    # is a deliberate rebuild rather than a consequence of someone else's
+    # release schedule.
+    ignore_changes = [boot_disk[0].initialize_params[0].image_id]
   }
 }
 
