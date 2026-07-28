@@ -116,9 +116,46 @@
         (testing "and tofu may stop the instance to attach it"
           (is (str/includes? main "allow_stopping_for_update = true")))
         (testing "a newer image in the family does not schedule a replacement"
+          (is (str/includes? main "data \"yandex_compute_image\""))
           (is (str/includes?
                main
                "ignore_changes = [boot_disk[0].initialize_params[0].image_id]"))))
+      (finally
+        (delete-tree! workdir)))))
+
+(deftest yandex-pins-the-image-when-one-is-named
+  (let [workdir (temp-dir)
+        opts {:workdir workdir
+              :profile "test"
+              :green/event :build
+              :provider-compute "yandex"
+              :provider-backend "local"
+              :compute-prevent-destroy true
+              :compute-pubkey "ssh-ed25519 AAAATEST operator"
+              :yandex-cloud-id "cloud-id"
+              :yandex-folder-id "folder-id"
+              :yandex-zone "ru-central1-a"
+              :yandex-image-family "ubuntu-2404-lts"
+              :yandex-image-id "fd8someimageid"
+              :yandex-name "once-test"
+              :yandex-subnet-cidr "10.0.0.0/24"
+              :yandex-platform-id "standard-v3"
+              :yandex-cores 2
+              :yandex-memory-gb 2
+              :yandex-core-fraction 100
+              :yandex-disk-size-gb 20}]
+    (try
+      (let [result (tools/tofu-compute-step opts)
+            main (slurp (io/file (tools/tool-dir opts "tofu-compute") "main.tf"))]
+        (is (zero? (:green/exit result)))
+        (is (str/includes? main "image_id = \"fd8someimageid\""))
+        (testing "the family lookup is gone, so nothing can move the image"
+          (is (not (str/includes? main "data \"yandex_compute_image\"")))
+          (is (not (str/includes? main "yandex_image_family"))))
+        (testing "and a change of the pin is allowed to plan a replacement"
+          ;; the directive, not the word: the comment above it explains why
+          ;; there is none
+          (is (not (str/includes? main "ignore_changes = [")))))
       (finally
         (delete-tree! workdir)))))
 
