@@ -145,9 +145,33 @@ Required credential: `GREEN_PAR_NO_INFRA_SMTP_PASSWORD`.
 
 ## DNS providers
 
-Use `:provider-dns "cloudflare"` or `:provider-dns "no-infra"`.
+Use `:provider-dns "cloudflare"`, `"yandex"`, or `"no-infra"`.
 
-Cloudflare requires `GREEN_PAR_CLOUDFLARE_API_TOKEN`. The token needs permission to discover and manage every zone derived from the application hosts: one proxied `A` record per application host, plus each zone's Resend verification records. `no-infra` renders an empty DNS module and requires no credential.
+### Cloudflare
+
+```clojure
+:provider-dns "cloudflare"
+```
+
+Requires `GREEN_PAR_CLOUDFLARE_API_TOKEN`. Every zone derived from the application hosts must already exist in the Cloudflare account, and the token needs permission to discover and manage each of them: one proxied `A` record per application host, plus each zone's Resend verification records.
+
+### Yandex Cloud DNS
+
+```clojure
+:provider-dns "yandex"
+:yandex-cloud-id "b1g..."
+:yandex-folder-id "b1g..."
+```
+
+Unlike Cloudflare, the zones do not have to exist beforehand: Green creates a public DNS zone in the configured folder for every domain derived from the application hosts, then adds one `A` record per application host and each zone's Resend verification records. Records are not proxied — hosts resolve straight to the server. Delegate each domain once at its registrar to `ns1.yandexcloud.net` and `ns2.yandexcloud.net`. Required credential: `GREEN_PAR_YANDEX_TOKEN`, passed to OpenTofu as the provider-native `YC_TOKEN` — the same token the Yandex compute provider uses, so selecting both means setting it once.
+
+### Existing DNS
+
+```clojure
+:provider-dns "no-infra"
+```
+
+Renders an empty DNS module and requires no credential; application and Resend records are your responsibility.
 
 ## State backends
 

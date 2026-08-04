@@ -76,7 +76,7 @@ nested `:once {:applications [...]}` collection:
                         :image "ghcr.io/example/another-site:latest"}]}
  :provider-compute "digitalocean" ; digitalocean, hcloud, yandex, oci, no-infra
  :provider-smtp "resend"          ; resend, no-infra
- :provider-dns "cloudflare"       ; cloudflare, no-infra
+ :provider-dns "cloudflare"       ; cloudflare, yandex, no-infra
  :provider-backend "r2"           ; r2, s3, local
  :compute-prevent-destroy true}
 ```
@@ -160,9 +160,11 @@ the remaining live checks are soft failures named in the report.
   `:compute-pubkey` through instance metadata, and authenticates with
   `GREEN_PAR_YANDEX_TOKEN`.
 - SMTP templates: Resend or `no-infra` SMTP settings.
-- DNS templates: Cloudflare or `no-infra`; the per-application and Resend DNS
-  records are generated as `apps.tf.json` and `smtp.tf.json` at the
-  compute/SMTP join.
+- DNS templates: Cloudflare, Yandex Cloud, or `no-infra`; the per-application
+  and Resend DNS records are generated as `apps.tf.json` and `smtp.tf.json` at
+  the compute/SMTP join. Cloudflare manages zones that already exist in the
+  account; Yandex creates a public zone per derived domain, so each domain is
+  delegated once to `ns1.yandexcloud.net` and `ns2.yandexcloud.net`.
 - Backends: local, S3, and Cloudflare R2, emitted as `backend.tf.json` and
   isolated by profile and tool under the state key `<profile>/<tool>.tfstate`.
 - `ansible-local` runs a playbook that writes the managed `Host <profile>`
